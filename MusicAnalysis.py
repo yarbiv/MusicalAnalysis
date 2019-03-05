@@ -87,6 +87,7 @@ def generate_wordcloud(artist_name, albums):
 
         filtered_string = " ".join(str(x) for x in filtered_list) # Turn a list into a string.
 
+        #TODO: add artist name/album name to each wordcloud
         wordcloud = WordCloud(collocations=False, background_color='white', max_words=100, max_font_size=40).generate(filtered_string)
         plt.figure()
         plt.imshow(wordcloud)
