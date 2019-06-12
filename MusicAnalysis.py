@@ -1,4 +1,6 @@
+from dotenv import load_dotenv
 import nltk
+import os
 import pylyrics3
 import spotipy
 import string
@@ -13,13 +15,14 @@ from nltk.tokenize import word_tokenize
 
 from wordcloud import WordCloud
 
+load_dotenv()
+CLIENT_ID = os.getenv(CLIENT_ID)
+CLIENT_SECRET = os.getenv(CLIENT_SECRET)
 
 def get_spotify_info(artist_name):
     #TODO: Break this up into several functions. One to get data, then we can do fun stuff with the data in separate functions
     #TODO: Ideally, a scatter plot of valence vs energy. This can show us the happiest, saddest, angriest songs etc.
-    your_client_id = "47f294e9b4e24b9cb471bee49c2b8bd2"
-    your_client_secret = "16b263bf04e446e48212d61403ee2939"
-    client_credentials_manager = SpotifyClientCredentials(client_id = your_client_id, client_secret = your_client_secret)
+    client_credentials_manager = SpotifyClientCredentials(client_id = CLIENT_ID, client_secret = CLIENT_SECRET)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
     search_artist_name = spotify.search(q='artist:' + artist_name, type='artist')
