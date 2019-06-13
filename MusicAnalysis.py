@@ -15,6 +15,8 @@ from nltk.tokenize import word_tokenize
 
 from wordcloud import WordCloud
 
+CONTRACTION_STEMS = ["nt","do","ca","ai"]
+
 load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
@@ -84,7 +86,7 @@ def generate_wordcloud(artist_name, albums):
         word_tokens = word_tokenize(album_text) # Tokenize text
         stripped_tokens = [w.translate(table) for w in word_tokens] # strip punctuation
         stripped_tokens = [w for w in stripped_tokens if w.isalpha()] # only alphabetic tokens
-        stripped_tokens = [w for w in stripped_tokens if w != "nt"] # Remove 'nt' contraction stems
+        stripped_tokens = [w for w in stripped_tokens if w not in CONTRACTION_STEMS] # Remove contraction stems
 
         filtered_list = []
         for w in stripped_tokens: # Remove stopwords
@@ -93,10 +95,10 @@ def generate_wordcloud(artist_name, albums):
 
         filtered_string = " ".join(str(x) for x in filtered_list) # Turn a list into a string.
 
-        wordcloud = WordCloud(collocations=False, background_color='white', max_words=100, max_font_size=40).generate(filtered_string)
+        wordcloud = WordCloud(collocations=False, background_color='white', max_words=70, max_font_size=40).generate(filtered_string)
         plt.figure()
         plt.title(album_key)
-        plt.imshow(wordcloud)
+        plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
         wordcloud_filename = album_key.replace(' ', '_') + "_wordcloud.png"
         cloud_path = os.path.join('files', wordcloud_filename)
