@@ -16,8 +16,8 @@ from nltk.tokenize import word_tokenize
 from wordcloud import WordCloud
 
 load_dotenv()
-CLIENT_ID = os.getenv(CLIENT_ID)
-CLIENT_SECRET = os.getenv(CLIENT_SECRET)
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 def get_spotify_info(artist_name):
     #TODO: Break this up into several functions. One to get data, then we can do fun stuff with the data in separate functions
@@ -25,8 +25,11 @@ def get_spotify_info(artist_name):
     client_credentials_manager = SpotifyClientCredentials(client_id = CLIENT_ID, client_secret = CLIENT_SECRET)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-    search_artist_name = spotify.search(q='artist:' + artist_name, type='artist')
-    artist_uri = search_artist_name['artists']['items'][0]["uri"]
+    search_artist_name = spotify.search(q='artist:' + artist_name, type='artist')['artists']['items']
+    if len(search_artist_name) == 0:
+        print("Error: couldn't find anything by {}".format(artist_name))
+        exit()
+    artist_uri = search_artist_name[0]["uri"]
     results = spotify.artist_albums(artist_uri, album_type='album', country="CA")
     album_results = results['items']
     album_names = [x['name'] for x in album_results]
@@ -90,12 +93,15 @@ def generate_wordcloud(artist_name, albums):
 
         filtered_string = " ".join(str(x) for x in filtered_list) # Turn a list into a string.
 
-        #TODO: add artist name/album name to each wordcloud
         wordcloud = WordCloud(collocations=False, background_color='white', max_words=100, max_font_size=40).generate(filtered_string)
         plt.figure()
+        plt.title(album_key)
         plt.imshow(wordcloud)
         plt.axis("off")
-        plt.savefig(album_key + " wordcloud.png") # TODO: don't save this to the root!
+        wordcloud_filename = album_key.replace(' ', '_') + "_wordcloud.png"
+        cloud_path = os.path.join('files', wordcloud_filename)
+        print(cloud_path)
+        plt.savefig(cloud_path, dpi=350)
 
 
 def lexical_diversity(artist_name, albums):
@@ -117,6 +123,7 @@ def lexical_diversity(artist_name, albums):
 
 def main():
     artist_name = input("Artist name: ")
+    artist_name = "Kids See Ghosts"
     get_spotify_info(artist_name)
     lyric_data = get_lyrics(artist_name)
     lexical_diversity(artist_name, lyric_data)
