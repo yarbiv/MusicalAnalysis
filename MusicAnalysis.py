@@ -123,7 +123,6 @@ def lexical_diversity(artist_name, albums):
 
 def main():
     artist_name = input("Artist name: ")
-    artist_name = "Kids See Ghosts"
     get_spotify_info(artist_name)
     lyric_data = get_lyrics(artist_name)
     lexical_diversity(artist_name, lyric_data)
