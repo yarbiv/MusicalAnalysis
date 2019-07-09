@@ -7,6 +7,8 @@ import string
 import sys
 
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -107,6 +109,7 @@ def generate_wordcloud(artist_name, albums):
 
 
 def lexical_diversity(artist_name, albums):
+    plt.figure(figsize=(10,6))
     lexical_diversity_albums = {}
     filter_out_artist_name = artist_name.lower().split(" ")
     table = str.maketrans('', '', string.punctuation)
@@ -120,14 +123,21 @@ def lexical_diversity(artist_name, albums):
             stripped_tokens = [w for w in stripped_tokens if w not in filter_out_artist_name] # Remove artist name (Sometimes lyric pages have this!)
             lexical_diversity_index = len(set(stripped_tokens)) / len(stripped_tokens)
             lexical_diversity_albums[album_key][track_key] = lexical_diversity_index
-
-    # TODO: Create box plot showing each album's average lexical diversity per track.
+    df = pd.DataFrame([(i,j,lexical_diversity_albums[i][j]) for i in lexical_diversity_albums.keys() for j in lexical_diversity_albums[i].keys()], columns=["album", "song", "lexical_diversity"])
+    sns.set_style("whitegrid")
+    ax = sns.boxplot(x="album", y="lexical_diversity", data=df)
+    ax = sns.stripplot(x="album", y="lexical_diversity", data=df, edgecolor='black', linewidth=0.2)
+    plt.ylabel('lexical diversity by song')
+    plt.title('Lexical diversity by album')
+    plt.gcf().autofmt_xdate(rotation=20)
+    plt.savefig(f'files/{artist_name.replace(" ", "_")}_lex.png')
 
 def main():
-    artist_name = input("Artist name: ")
-    get_spotify_info(artist_name)
+    # artist_name = input("Artist name: ")
+    artist_name = "Kanye West"
+    # get_spotify_info(artist_name)
     lyric_data = get_lyrics(artist_name)
     lexical_diversity(artist_name, lyric_data)
-    generate_wordcloud(artist_name, lyric_data)
+    # generate_wordcloud(artist_name, lyric_data)
 
 main()
