@@ -24,8 +24,6 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 def get_spotify_info(artist_name):
-    #TODO: Break this up into several functions. One to get data, then we can do fun stuff with the data in separate functions
-    #TODO: Ideally, a scatter plot of valence vs energy. This can show us the happiest, saddest, angriest songs etc.
     client_credentials_manager = SpotifyClientCredentials(client_id = CLIENT_ID, client_secret = CLIENT_SECRET)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -44,24 +42,26 @@ def get_spotify_info(artist_name):
         album_pair = [album_names[i], spotify.album_tracks(album['uri'])["items"]]
         albums.append(album_pair)
 
+    album_features_dict = {}
+
     for album in albums:
-        valence_sum = 0
-        energy_sum = 0
-        danceability_sum = 0
-        sonic_score_sum = 0
+        album_name = album[0]
+        if album_name not in album_features_dict:
+            album_features_dict[album_name] = {}
+        else:
+            pass
         for track in album[1]:
             track_name = track['name']
+            album_features_dict[album_name][track_name] = {}
             features = spotify.audio_features(track['uri'])
             energy = [x['energy'] for x in features]
             valence = [x['valence'] for x in features]
             danceability = [x['danceability'] for x in features]
-            valence_sum += valence[0]
-            energy_sum += energy[0]
-            danceability_sum += danceability[0]
-        print("album name: " + str(album[0]))
-        print('avg energy: ' + str(energy_sum / len(album[1])))
-        print('avg valence: ' +  str(valence_sum / len(album[1])))
-        print('avg danceability: ' + str(danceability_sum / len(album[1])))
+            album_features_dict[album_name][track_name]['valence'] = valence[0]
+            album_features_dict[album_name][track_name]['danceability'] = danceability[0]
+            album_features_dict[album_name][track_name]['energy'] = energy[0]
+    df = pd.DataFrame([(i,j,album_features_dict[i][j]['valence'], album_features_dict[i][j]['danceability'], album_features_dict[i][j]['energy']) for i in album_features_dict.keys() for j in album_features_dict[i].keys()], columns=["album", "song", "valence", "danceability", "energy"])
+    return df
 
 
 def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
@@ -133,11 +133,10 @@ def lexical_diversity(artist_name, albums):
     plt.savefig(f'files/{artist_name.replace(" ", "_")}_lex.png')
 
 def main():
-    # artist_name = input("Artist name: ")
-    artist_name = "Kanye West"
-    # get_spotify_info(artist_name)
+    artist_name = input("Artist name: ")
+    get_spotify_info(artist_name)
     lyric_data = get_lyrics(artist_name)
     lexical_diversity(artist_name, lyric_data)
-    # generate_wordcloud(artist_name, lyric_data)
+    generate_wordcloud(artist_name, lyric_data)
 
 main()
