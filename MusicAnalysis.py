@@ -9,6 +9,7 @@ import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import numpy as np
 
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -60,8 +61,23 @@ def get_spotify_info(artist_name):
             album_features_dict[album_name][track_name]['valence'] = valence[0]
             album_features_dict[album_name][track_name]['danceability'] = danceability[0]
             album_features_dict[album_name][track_name]['energy'] = energy[0]
-    df = pd.DataFrame([(i,j,album_features_dict[i][j]['valence'], album_features_dict[i][j]['danceability'], album_features_dict[i][j]['energy']) for i in album_features_dict.keys() for j in album_features_dict[i].keys()], columns=["album", "song", "valence", "danceability", "energy"])
+    df = pd.DataFrame([(i,j,album_features_dict[i][j]['valence'], album_features_dict[i][j]['danceability'], album_features_dict[i][j]['energy']) \
+        for i in album_features_dict.keys() for j in album_features_dict[i].keys()], columns=["album", "song", "valence", "danceability", "energy"])
     return df
+
+def musical_feature_scatter(spotify_data):
+    albums = spotify_data.album.unique()
+    print(albums)
+    cmap = plt.get_cmap('viridis')
+    colors = cmap(np.linspace(0, 1, len(albums)))
+    groups = spotify_data.groupby("album")
+    for i, (name, group) in enumerate(groups):
+        plt.scatter(group['valence'], group['energy'], label=name, c=colors[i])
+        print(i, name, colors[i])
+        # print(name)
+        # print(group['valence'])
+        # print(group['energy'])
+    plt.savefig('TEST.png')
 
 
 def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
@@ -130,13 +146,17 @@ def lexical_diversity(artist_name, albums):
     plt.ylabel('lexical diversity by song')
     plt.title('Lexical diversity by album')
     plt.gcf().autofmt_xdate(rotation=20)
-    plt.savefig(f'files/{artist_name.replace(" ", "_")}_lex.png')
+    replaced_artist_name = artist_name.replace(" ", "_")
+    file_name = f"{replaced_artist_name}_lex.png"
+    plt.savefig(f"files/{file_name}")
 
 def main():
     artist_name = input("Artist name: ")
-    get_spotify_info(artist_name)
+    spotify_data = get_spotify_info(artist_name)
     lyric_data = get_lyrics(artist_name)
     lexical_diversity(artist_name, lyric_data)
     generate_wordcloud(artist_name, lyric_data)
+    musical_feature_scatter(spotify_data)
+
 
 main()
