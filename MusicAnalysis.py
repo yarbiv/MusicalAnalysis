@@ -24,7 +24,7 @@ load_dotenv()
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
-def get_spotify_info(artist_name):
+def get_spotify_data(artist_name):
     client_credentials_manager = SpotifyClientCredentials(client_id = CLIENT_ID, client_secret = CLIENT_SECRET)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -65,20 +65,41 @@ def get_spotify_info(artist_name):
         for i in album_features_dict.keys() for j in album_features_dict[i].keys()], columns=["album", "song", "valence", "danceability", "energy"])
     return df
 
-def musical_feature_scatter(spotify_data):
+def musical_feature_scatter(artist_name, spotify_data):
     albums = spotify_data.album.unique()
-    print(albums)
     cmap = plt.get_cmap('viridis')
     colors = cmap(np.linspace(0, 1, len(albums)))
     groups = spotify_data.groupby("album")
-    for i, (name, group) in enumerate(groups):
-        plt.scatter(group['valence'], group['energy'], label=name, c=colors[i])
-        print(i, name, colors[i])
-        # print(name)
-        # print(group['valence'])
-        # print(group['energy'])
-    plt.savefig('TEST.png')
 
+    fig, ax = plt.subplots()
+    curr_color = 0
+    for name, group in groups:
+        ax.plot(group.valence, group.energy, label=name, marker='o', linestyle='', c=colors[curr_color], ms=3.75)
+        curr_color += 1
+    ax.legend(bbox_to_anchor=(1.04,1), borderaxespad=0)
+    fig.set_figheight(10)
+    fig.set_figheight(6)
+    plt.xlabel('valence')
+    plt.ylabel('energy')
+    replaced_artist_name = artist_name.replace(" ", "_")
+    file_name = f"{replaced_artist_name}_scatter.png"
+    plt.savefig(f'files/{file_name}', bbox_inches="tight")
+
+def rank_songs_by(spotify_data, attribute_to_rank):
+    fig, ax = plt.subplots()
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+
+    data_copy = spotify_data
+    attributes = ["valence", "energy", "danceability"]
+    for attribute in attributes:
+        if attribute != attribute_to_rank:
+            del data_copy[attribute]
+
+    sorted_data_ascending = data_copy.sort_values(attribute_to_rank)
+    sorted_data_descending = data_copy.sort_values(attribute_to_rank, ascending=False)
+    tables = [sorted_data_ascending.head().style.render(), sorted_data_descending.head().style.render()]
+    return pair
 
 def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
     albums = {}
@@ -123,7 +144,6 @@ def generate_wordcloud(artist_name, albums):
         print(cloud_path)
         plt.savefig(cloud_path, dpi=350)
 
-
 def lexical_diversity(artist_name, albums):
     plt.figure(figsize=(10,6))
     lexical_diversity_albums = {}
@@ -152,11 +172,12 @@ def lexical_diversity(artist_name, albums):
 
 def main():
     artist_name = input("Artist name: ")
-    spotify_data = get_spotify_info(artist_name)
-    lyric_data = get_lyrics(artist_name)
-    lexical_diversity(artist_name, lyric_data)
-    generate_wordcloud(artist_name, lyric_data)
-    musical_feature_scatter(spotify_data)
+    spotify_data = get_spotify_data(artist_name)
+    # lyric_data = get_lyrics(artist_name)
+    # lexical_diversity(artist_name, lyric_data)
+    # generate_wordcloud(artist_name, lyric_data)
+    # musical_feature_scatter(artist_name, spotify_data)
+    rank_songs_by(spotify_data, "valence")
 
 
 main()
