@@ -173,10 +173,10 @@ def lexical_diversity(artist_name, albums):
 def main():
     artist_name = input("Artist name: ")
     spotify_data = get_spotify_data(artist_name)
-    # lyric_data = get_lyrics(artist_name)
-    # lexical_diversity(artist_name, lyric_data)
-    # generate_wordcloud(artist_name, lyric_data)
-    # musical_feature_scatter(artist_name, spotify_data)
+    lyric_data = get_lyrics(artist_name)
+    lexical_diversity(artist_name, lyric_data)
+    generate_wordcloud(artist_name, lyric_data)
+    musical_feature_scatter(artist_name, spotify_data)
     rank_songs_by(spotify_data, "valence")
 
 
