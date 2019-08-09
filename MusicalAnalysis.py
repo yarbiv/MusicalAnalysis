@@ -5,6 +5,7 @@ import pylyrics3
 import spotipy
 import string
 import sys
+import datetime
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -65,7 +66,7 @@ def get_spotify_data(artist_name):
         for i in album_features_dict.keys() for j in album_features_dict[i].keys()], columns=["album", "song", "valence", "danceability", "energy"])
     return df
 
-def musical_feature_scatter(artist_name, spotify_data):
+def musical_feature_scatter(artist_name, spotify_data, save_path):
     albums = spotify_data.album.unique()
     cmap = plt.get_cmap('viridis')
     colors = cmap(np.linspace(0, 1, len(albums)))
@@ -83,7 +84,8 @@ def musical_feature_scatter(artist_name, spotify_data):
     plt.ylabel('energy')
     replaced_artist_name = artist_name.replace(" ", "_")
     file_name = f"{replaced_artist_name}_scatter.png"
-    plt.savefig(f'files/{file_name}', bbox_inches="tight")
+    plt.savefig(f'{save_path}/scatter/{file_name}', bbox_inches="tight")
+    return f'{save_path}/scatter/{file_name}'
 
 def rank_songs_by(spotify_data, attribute_to_rank):
     fig, ax = plt.subplots()
@@ -99,7 +101,8 @@ def rank_songs_by(spotify_data, attribute_to_rank):
     sorted_data_ascending = data_copy.sort_values(attribute_to_rank)
     sorted_data_descending = data_copy.sort_values(attribute_to_rank, ascending=False)
     tables = [sorted_data_ascending.head().style.render(), sorted_data_descending.head().style.render()]
-    return pair
+    # todo: save
+    return tables
 
 def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
     albums = {}
@@ -113,10 +116,11 @@ def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
 
     return albums
 
-def generate_wordcloud(artist_name, albums):
+def generate_wordcloud(artist_name, albums, save_path):
     filter_out_artist_name = artist_name.lower().split(" ")
     stop_words = set(stopwords.words('english'))
     table = str.maketrans('', '', string.punctuation)
+    paths = []
 
     for album_key, album_val in albums.items():
         album_text = ""
@@ -140,11 +144,12 @@ def generate_wordcloud(artist_name, albums):
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
         wordcloud_filename = album_key.replace(' ', '_') + "_wordcloud.png"
-        cloud_path = os.path.join('files', wordcloud_filename)
-        print(cloud_path)
+        cloud_path = f"{save_path}/wordcloud/{wordcloud_filename}"
         plt.savefig(cloud_path, dpi=350)
+        paths.append(cloud_path)
+    return paths
 
-def lexical_diversity(artist_name, albums):
+def lexical_diversity(artist_name, albums, save_path):
     plt.figure(figsize=(10,6))
     lexical_diversity_albums = {}
     filter_out_artist_name = artist_name.lower().split(" ")
@@ -168,16 +173,28 @@ def lexical_diversity(artist_name, albums):
     plt.gcf().autofmt_xdate(rotation=20)
     replaced_artist_name = artist_name.replace(" ", "_")
     file_name = f"{replaced_artist_name}_lex.png"
-    plt.savefig(f"files/{file_name}")
+    plt.savefig(f"{save_path}/lexdiv/{file_name}")
+    return f"{save_path}/lexdiv/{file_name}"
 
-def main():
-    artist_name = input("Artist name: ")
+def setup_dirs():
+    dir_name = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    save_path = os.path.join('static', dir_name)
+    if not os.path.exists('static'):
+        os.mkdir('static')
+    os.mkdir(save_path)
+    os.mkdir(os.path.join(save_path, 'lexdiv'))
+    os.mkdir(os.path.join(save_path, 'wordcloud'))
+    os.mkdir(os.path.join(save_path, 'rank'))
+    os.mkdir(os.path.join(save_path, 'scatter'))
+    return save_path
+
+def musical_analysis(artist_name):
+    save_path = setup_dirs()
     spotify_data = get_spotify_data(artist_name)
     lyric_data = get_lyrics(artist_name)
-    lexical_diversity(artist_name, lyric_data)
-    generate_wordcloud(artist_name, lyric_data)
-    musical_feature_scatter(artist_name, spotify_data)
+    paths = []
+    paths.append(lexical_diversity(artist_name, lyric_data, save_path))
+    paths.append(generate_wordcloud(artist_name, lyric_data, save_path))
+    paths.append(musical_feature_scatter(artist_name, spotify_data, save_path))
     rank_songs_by(spotify_data, "valence")
-
-
-main()
+    return paths
