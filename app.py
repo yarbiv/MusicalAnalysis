@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
-app = Flask(__name__, static_url_path='/static')
+from flask_cors import CORS
 from MusicalAnalysis import musical_analysis
 
-@app.route("/")
+app = Flask(__name__, static_url_path='/static')
+CORS(app)
+
+@app.route("/analyze")
 def flaskWrapper():
     return jsonify(musical_analysis(request.args.get('artist_name')))
