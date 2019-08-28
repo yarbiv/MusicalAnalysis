@@ -24,24 +24,21 @@ function App() {
         },
       })
       .then((response) => {
-        console.log(response);
         setApiData(response.data);
       });
   }
 
   return (
     <div className="App">
-      <header className="App-header">
-        <form>
-          <input value={input} onInput={(e) => setInput(e.target.value)} />
-          <button type="button" onClick={getDataRoutes}>Go</button>
-          <ImageContainer apiData={apiData} />
-          <ClipLoader
-            css={override}
-            loading={apiData === 'fetching'}
-          />
-        </form>
-      </header>
+      <form>
+        <input value={input} onInput={(e) => setInput(e.target.value)} />
+        <button type="button" onClick={getDataRoutes}>Go</button>
+        <ClipLoader
+          css={override}
+          loading={apiData === 'fetching'}
+        />
+      </form>
+      <ImageContainer apiData={apiData} />
     </div>
   );
 }
