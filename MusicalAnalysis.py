@@ -87,12 +87,12 @@ def musical_feature_scatter(artist_name, spotify_data, save_path):
     plt.savefig(f'{save_path}/scatter/{file_name}', bbox_inches="tight")
     return f'{save_path}/scatter/{file_name}'
 
-def rank_songs_by(spotify_data, attribute_to_rank):
+def rank_songs_by(spotify_data, attribute_to_rank, save_path):
     fig, ax = plt.subplots()
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
 
-    data_copy = spotify_data
+    data_copy = spotify_data.copy()
     attributes = ["valence", "energy", "danceability"]
     for attribute in attributes:
         if attribute != attribute_to_rank:
@@ -100,9 +100,24 @@ def rank_songs_by(spotify_data, attribute_to_rank):
 
     sorted_data_ascending = data_copy.sort_values(attribute_to_rank)
     sorted_data_descending = data_copy.sort_values(attribute_to_rank, ascending=False)
-    tables = [sorted_data_ascending.head().style.render(), sorted_data_descending.head().style.render()]
-    # todo: save
-    return tables
+
+    ascending_html = sorted_data_ascending.head() \
+    .style \
+    .set_properties(**{'font-size': '9pt', 'font-family': 'Calibri'}) \
+    .render(caption=f"{attribute_to_rank} ascending")
+
+    descending_html = sorted_data_descending.head() \
+    .style \
+    .set_properties(**{'font-size': '9pt', 'font-family': 'Calibri'}) \
+    .render(caption=f"{attribute_to_rank} descending")
+
+    ascending_path = f'{save_path}/rank/{attribute_to_rank}_ascending.html'
+    descending_path = f'{save_path}/rank/{attribute_to_rank}_descending.html'
+    with open(ascending_path, 'w+') as file:
+        file.write(ascending_html)
+    with open(descending_path, 'w+') as file:
+        file.write(descending_html)
+    return [ascending_path, descending_path]
 
 def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
     albums = {}
@@ -196,5 +211,6 @@ def musical_analysis(artist_name):
     paths.append(lexical_diversity(artist_name, lyric_data, save_path))
     paths.append(generate_wordcloud(artist_name, lyric_data, save_path))
     paths.append(musical_feature_scatter(artist_name, spotify_data, save_path))
-    rank_songs_by(spotify_data, "valence")
+    paths.append(rank_songs_by(spotify_data, "valence", save_path))
+    paths.append(rank_songs_by(spotify_data, "energy", save_path))
     return paths

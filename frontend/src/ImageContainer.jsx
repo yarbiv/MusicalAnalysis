@@ -1,12 +1,36 @@
+import ClipLoader from 'react-spinners/ClipLoader';
+
+import { css } from '@emotion/core';
 import React from 'react';
 
 const host = 'http://localhost:5000/';
 
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
+
+function getExt(filename) {
+  return filename.split('.').pop();
+}
+
+function getNameFromPath(path) {
+  return path.split('/').pop();
+}
+
 function recurseForPaths(item) {
   if (typeof item === 'string') {
-    return (
-      <img style={{ width: '100%' }} key={item} src={host + item} alt="" />
-    );
+    if (getExt(item) === 'png') {
+      return (
+        <img style={{ width: '100%' }} key={item} src={host + item} alt="" />
+      );
+    }
+    if (getExt(item) === 'html') {
+      return (
+        <iframe key={item} src={host + item} title={getNameFromPath(item)} />
+      );
+    }
   }
   return (
     <div>
@@ -14,7 +38,6 @@ function recurseForPaths(item) {
     </div>
   );
 }
-
 const ImageContainer = (props) => {
   const { apiData } = props;
   if (apiData && apiData !== 'fetching') {
@@ -25,7 +48,12 @@ const ImageContainer = (props) => {
     );
   }
   if (apiData === 'fetching') {
-    return <div />;
+    return (
+      <ClipLoader
+        css={override}
+        loading={apiData === 'fetching'}
+      />
+    );
   }
   return <div />;
 };
