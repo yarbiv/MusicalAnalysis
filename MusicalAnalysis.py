@@ -104,12 +104,12 @@ def rank_songs_by(spotify_data, attribute_to_rank, save_path):
     ascending_html = sorted_data_ascending.head() \
     .style \
     .set_properties(**{'font-size': '9pt', 'font-family': 'Calibri'}) \
-    .render(caption=f"{attribute_to_rank} ascending")
+    .render(caption=f"bottom 5 songs by {attribute_to_rank}")
 
     descending_html = sorted_data_descending.head() \
     .style \
     .set_properties(**{'font-size': '9pt', 'font-family': 'Calibri'}) \
-    .render(caption=f"{attribute_to_rank} descending")
+    .render(caption=f"top 5 songs by {attribute_to_rank}")
 
     ascending_path = f'{save_path}/rank/{attribute_to_rank}_ascending.html'
     descending_path = f'{save_path}/rank/{attribute_to_rank}_descending.html'
