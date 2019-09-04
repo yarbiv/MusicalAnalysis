@@ -1,22 +1,21 @@
-from dotenv import load_dotenv
-import nltk
+import datetime
+import json
 import os
-import pylyrics3
-import spotipy
 import string
 import sys
-import datetime
 
 import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
+import nltk
 import numpy as np
-
-from spotipy.oauth2 import SpotifyClientCredentials
-
+import pandas as pd
+import pylyrics3
+import seaborn as sns
+import spotipy
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from spotipy.oauth2 import SpotifyClientCredentials
 
+from dotenv import load_dotenv
 from wordcloud import WordCloud
 
 CONTRACTION_STEMS = ["nt","do","ca","ai"]
@@ -194,8 +193,6 @@ def lexical_diversity(artist_name, albums, save_path):
 def setup_dirs():
     dir_name = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     save_path = os.path.join('static', dir_name)
-    if not os.path.exists('static'):
-        os.mkdir('static')
     os.mkdir(save_path)
     os.mkdir(os.path.join(save_path, 'lexdiv'))
     os.mkdir(os.path.join(save_path, 'wordcloud'))
@@ -203,7 +200,7 @@ def setup_dirs():
     os.mkdir(os.path.join(save_path, 'scatter'))
     return save_path
 
-def musical_analysis(artist_name):
+def musical_analysis(artist_name, job_id):
     save_path = setup_dirs()
     spotify_data = get_spotify_data(artist_name)
     lyric_data = get_lyrics(artist_name)
@@ -213,4 +210,5 @@ def musical_analysis(artist_name):
     paths.append(musical_feature_scatter(artist_name, spotify_data, save_path))
     paths.append(rank_songs_by(spotify_data, "valence", save_path))
     paths.append(rank_songs_by(spotify_data, "energy", save_path))
-    return paths
+    with open(f'static/{job_id}/results.json', 'w+') as file:
+        json.dump(paths, file)
