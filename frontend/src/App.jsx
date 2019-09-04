@@ -3,21 +3,34 @@ import axios from 'axios';
 import './App.css';
 import ImageContainer from './ImageContainer';
 
+const host = 'http://localhost:5000/';
 
 function App() {
   const [apiData, setApiData] = useState(null);
   const [input, setInput] = useState('');
 
-  function getDataRoutes() {
+
+
+  function getDataRoute() {
     setApiData('fetching');
     axios
-      .get('http://localhost:5000/analyze', {
+      .get(`${host}analyze`, {
         params: {
           artist_name: input,
         },
       })
       .then((response) => {
-        setApiData(response.data);
+        const responsePath = response.data.save_path;
+        async function refresh() {
+          const response = await axios.get(`${host}${responsePath}`);
+          if (response.body.status) {
+            setTimeout(refresh, 5000);
+          }
+          else {
+            setApiData(response.body);
+          }
+        }
+        refresh();
       });
   }
 
@@ -25,7 +38,7 @@ function App() {
     <div className="App">
       <form>
         <input value={input} onInput={(e) => setInput(e.target.value)} />
-        <button type="button" onClick={getDataRoutes}>Go</button>
+        <button type="button" onClick={getDataRoute}>Go</button>
       </form>
       <ImageContainer apiData={apiData} />
     </div>
