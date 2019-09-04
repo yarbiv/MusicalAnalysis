@@ -20,14 +20,13 @@ function App() {
         },
       })
       .then((response) => {
-        const responsePath = response.data.save_path;
+        const job_id = response.data.job_id;
         async function refresh() {
-          const response = await axios.get(`${host}${responsePath}`);
-          if (response.body.status) {
+          const process_response = await axios.get(`${host}static/${job_id}/results.json`);
+          if (process_response.data.status && process_response.data.status === 'processing') {
             setTimeout(refresh, 5000);
-          }
-          else {
-            setApiData(response.body);
+          } else {
+            setApiData(process_response.data);
           }
         }
         refresh();
