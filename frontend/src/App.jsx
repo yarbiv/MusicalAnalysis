@@ -3,7 +3,7 @@ import axios from 'axios';
 import './App.css';
 import ImageContainer from './ImageContainer';
 
-const host = 'http://localhost:5000/';
+const host = 'https://musicalanalysis.herokuapp.com/';
 
 function App() {
   const [apiData, setApiData] = useState(null);

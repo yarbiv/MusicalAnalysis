@@ -3,7 +3,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { css } from '@emotion/core';
 import React from 'react';
 
-const host = 'http://localhost:5000/';
+const host = 'https://musicalanalysis.herokuapp.com/';
 
 const override = css`
   display: block;
