@@ -3,7 +3,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import { css } from '@emotion/core';
 import React from 'react';
 
-const host = 'https://musicalanalysis.herokuapp.com/';
+const host = 'http://api.musicalanalysis.yoavarbiv.com/';
 
 const override = css`
   display: block;
@@ -20,6 +20,7 @@ function getNameFromPath(path) {
 }
 
 function onLoad() {
+  document.domain = "yoavarbiv.com";
   const iframes = document.getElementsByTagName('iframe');
   const elem = iframes[0];
   console.log(elem.contentWindow)

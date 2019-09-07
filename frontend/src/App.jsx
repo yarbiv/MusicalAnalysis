@@ -3,7 +3,7 @@ import axios from 'axios';
 import './App.css';
 import ImageContainer from './ImageContainer';
 
-const host = 'https://musicalanalysis.herokuapp.com/';
+const host = 'http://api.musicalanalysis.yoavarbiv.com/';
 
 function App() {
   const [apiData, setApiData] = useState(null);

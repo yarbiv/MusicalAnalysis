@@ -114,10 +114,10 @@ def rank_songs_by(spotify_data, attribute_to_rank, save_path):
     descending_path = f'{save_path}/rank/{attribute_to_rank}_descending.html'
     with open(ascending_path, 'w+') as file:
         file.write(ascending_html)
-        file.write(r'<style type="text/css" >body {margin: 0;}</style><script>document.domain ="http://localhost:3000"</script>')
+        file.write(r'<style type="text/css" >body {margin: 0;}</style><script>document.domain ="yoavarbiv.com"</script>')
     with open(descending_path, 'w+') as file:
         file.write(descending_html)
-        file.write(r'<style type="text/css" >body {margin: 0;}</style><script>document.domain ="http://localhost:3000"</script>')
+        file.write(r'<style type="text/css" >body {margin: 0;}</style><script>document.domain ="yoavarbiv.com"</script>')
     return [ascending_path, descending_path]
 
 def get_lyrics(artist_name): # Gets raw lyrics in lowercase.
