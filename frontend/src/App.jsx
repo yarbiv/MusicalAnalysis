@@ -9,7 +9,12 @@ function App() {
   const [apiData, setApiData] = useState(null);
   const [input, setInput] = useState('');
 
-
+  function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      getDataRoute();
+      e.preventDefault();
+    }
+  }
 
   function getDataRoute() {
     setApiData('fetching');
@@ -36,8 +41,8 @@ function App() {
   return (
     <div className="App">
       <form>
-        <input value={input} onInput={(e) => setInput(e.target.value)} />
-        <button type="button" onClick={getDataRoute}>Go</button>
+        <input value={input} onInput={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} />
+        <button type="button" onClick={getDataRoute} >Go</button>
       </form>
       <ImageContainer apiData={apiData} />
     </div>
