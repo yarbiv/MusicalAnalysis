@@ -19,6 +19,13 @@ function getNameFromPath(path) {
   return path.split('/').pop();
 }
 
+function onLoad() {
+  const iframes = document.getElementsByTagName('iframe');
+  const elem = iframes[0];
+  console.log(elem.contentWindow)
+  elem.contentWindow ? console.log(elem.contentWindow.document) : console.log('woop');
+}
+
 function recurseForPaths(item) {
   if (typeof item === 'string') {
     if (getExt(item) === 'png') {
@@ -28,7 +35,7 @@ function recurseForPaths(item) {
     }
     if (getExt(item) === 'html') {
       return (
-        <iframe key={item} src={host + item} title={getNameFromPath(item)} />
+        <iframe key={item} src={host + item} title={getNameFromPath(item)} onLoad={onLoad} frameBorder='0px' />
       );
     }
   }
