@@ -22,9 +22,9 @@ function getNameFromPath(path) {
 function onLoad() {
   document.domain = "yoavarbiv.com";
   const iframes = document.getElementsByTagName('iframe');
-  const elem = iframes[0];
-  console.log(elem.contentWindow)
-  elem.contentWindow ? console.log(elem.contentWindow.document) : console.log('woop');
+  Array.from(iframes).forEach((iframe) => {
+    iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+  });
 }
 
 function recurseForPaths(item) {
