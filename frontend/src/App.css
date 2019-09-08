@@ -18,3 +18,13 @@ iframe {
       "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
       sans-serif;
 }
+
+h1 {
+  color: aquamarine;
+  font-size: 36px;
+}
+
+h2 {
+  color: mediumaquamarine;
+  font-size: 24px;
+}

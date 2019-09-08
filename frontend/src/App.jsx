@@ -40,6 +40,8 @@ function App() {
 
   return (
     <div className="App">
+      <h1>MusicalAnalysis</h1>
+      <h2>Take a deep dive into your favourite music by typing in an artist's name!</h2>
       <form>
         <input value={input} onInput={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} />
         <button type="button" onClick={getDataRoute} >Go</button>
