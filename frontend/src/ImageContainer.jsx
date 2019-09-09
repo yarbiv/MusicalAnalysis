@@ -1,4 +1,4 @@
-import ClipLoader from 'react-spinners/ClipLoader';
+import HashLoader from 'react-spinners/HashLoader';
 
 import { css } from '@emotion/core';
 import React from 'react';
@@ -8,7 +8,6 @@ const host = 'http://api.musicalanalysis.yoavarbiv.com/';
 const override = css`
   display: block;
   margin: 0 auto;
-  border-color: red;
 `;
 
 function getExt(filename) {
@@ -57,10 +56,15 @@ const ImageContainer = (props) => {
   }
   if (apiData === 'fetching') {
     return (
-      <ClipLoader
-        css={override}
-        loading={apiData === 'fetching'}
-      />
+      <div style={{marginTop: "6vw"}}>
+        <p style={{color: "mediumaquamarine"}}>Processing...</p>
+        <HashLoader
+          css={override}
+          loading={apiData === 'fetching'}
+          color="#66ddaa"
+          size={100}
+        />
+      </div>
     );
   }
   return <div />;

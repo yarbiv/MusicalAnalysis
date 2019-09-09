@@ -17,6 +17,9 @@ function App() {
   }
 
   function getDataRoute() {
+    if (apiData === 'fetching') {
+      return;
+    }
     setApiData('fetching');
     axios
       .get(`${host}analyze`, {
